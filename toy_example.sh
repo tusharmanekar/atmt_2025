@@ -53,7 +53,8 @@ python train.py \
     --dim-feedforward-decoder 1024 \
     --max-seq-len 100 \
     --n-encoder-layers 3 \
-    --n-decoder-layers 3
+    --n-decoder-layers 3 \
+    --cuda
 
 python translate.py \
     --input toy_example/data/raw/test.cz \
@@ -64,4 +65,5 @@ python translate.py \
     --max-len 100 \
     --output toy_example/toy_example_output.en \
     --bleu \
-    --reference toy_example/data/raw/test.en
+    --reference toy_example/data/raw/test.en \
+    --cuda
