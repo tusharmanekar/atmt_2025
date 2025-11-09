@@ -178,6 +178,7 @@ class TransformerDecoder(Seq2SeqDecoder):
 
         # No absolute positional addition
         # RoPE will inject position in attention
+        x = self.tok_embed(trg)
         x = self.dropout(x)
         for layer in self.decoder_blocks:
             x = layer(encoder_out, src_mask, x, trg_mask)
