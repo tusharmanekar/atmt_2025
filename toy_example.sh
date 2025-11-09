@@ -34,6 +34,7 @@ python preprocess.py \
     --force-train
 
 python train.py \
+    --cuda \
     --data toy_example/data/prepared/ \
     --src-tokenizer toy_example/tokenizers/cz-bpe-1000.model \
     --tgt-tokenizer toy_example/tokenizers/en-bpe-1000.model \
@@ -57,6 +58,7 @@ python train.py \
     --cuda
 
 python translate.py \
+    --cuda \
     --input toy_example/data/raw/test.cz \
     --src-tokenizer toy_example/tokenizers/cz-bpe-1000.model \
     --tgt-tokenizer toy_example/tokenizers/en-bpe-1000.model \

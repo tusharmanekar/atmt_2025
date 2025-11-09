@@ -5,6 +5,7 @@ from seq2seq import utils
 from seq2seq.models import register_model, register_model_architecture
 from seq2seq.models import Seq2SeqModel, Seq2SeqEncoder, Seq2SeqDecoder
 import sentencepiece as spm
+from rope import apply_rotary_pos_emb
 
 
 
@@ -98,8 +99,14 @@ class TransformerEncoder(Seq2SeqEncoder):
 
     def forward(self, input, mask=None):
         x = self.tok_embed(input) # Vectors
-        x_pos = self.pos_embed[:, :x.size(1), :]  # Vectors'
-        x = self.dropout(x + x_pos) # update vectors with position information
+
+        # x_pos = self.pos_embed[:, :x.size(1), :]  # Vectors'
+        # x = self.dropout(x + x_pos) # update vectors with position information
+
+        # No absolute positional addition
+        # RoPE will inject position in attention
+        x = self.dropout(x)
+
         for layer in self.encoder_blocks:
             x = layer(x, mask) # (50,512)
         
@@ -166,7 +173,11 @@ class TransformerDecoder(Seq2SeqDecoder):
 
         seq_len = trg.size(1)
         trg_mask = torch.logical_or(trg_pad_mask, self.future_mask(seq_len))
-        x = self.tok_embed(trg) + self.pos_embed[:, :trg.size(1), :]
+
+        # x = self.tok_embed(trg) + self.pos_embed[:, :trg.size(1), :]
+
+        # No absolute positional addition
+        # RoPE will inject position in attention
         x = self.dropout(x)
         for layer in self.decoder_blocks:
             x = layer(encoder_out, src_mask, x, trg_mask)
@@ -196,6 +207,13 @@ class MultiHeadedAttention(nn.Module):
         query = self.WQ(x_query).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
         key   = self.WK(x_key).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
         value = self.WV(x_value).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
+
+        # 1.5) Apply RoPE to Q and K
+        # For self-attention- L_q == L_k
+        # For cross-attention- this might not always be true
+        # Apply per-length embeddings
+        query, key = apply_rotary_pos_emb(query, key)
+
         # 2) Attention
         # scores has dimensions: nbatch * h * seq_len * seq_len
         scores = torch.matmul(query, key.transpose(-2, -1))/math.sqrt(self.d_k)
