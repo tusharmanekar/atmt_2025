@@ -5,20 +5,24 @@
 #SBATCH --mem=16GB
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
-#SBATCH --output=out_assignment1.out
+#SBATCH --output=out_assignment3.out
 
 module load gpu
 module load mamba
 source activate atmt
 export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 
+# Make sure directories exist
+mkdir -p assignment3/cz-en/data/prepared
+mkdir -p assignment3/cz-en/logs
+mkdir -p assignment3/cz-en/checkpoints
 
 # PREPARE DATA
 python preprocess.py \
     --source-lang cz \
     --target-lang en \
     --raw-data ~/shares/cz-en/data/raw \
-    --dest-dir ./cz-en/data/prepared \
+    --dest-dir assignment3/cz-en/data/prepared \
     --model-dir ./cz-en/tokenizers \
     --test-prefix test \
     --train-prefix train \
@@ -31,7 +35,7 @@ python preprocess.py \
 # TRAIN
 python train.py \
     --cuda \
-    --data cz-en/data/prepared/ \
+    --data assignment3/cz-en/data/prepared/ \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
     --source-lang cz \
@@ -39,8 +43,8 @@ python train.py \
     --batch-size 64 \
     --arch transformer \
     --max-epoch 7 \
-    --log-file assignment3/logs/train.log \
-    --save-dir assignment3/checkpoints/ \
+    --log-file assignment3/cz-en/logs/train.log \
+    --save-dir assignment3/cz-en/checkpoints/ \
     --ignore-checkpoints \
     --encoder-dropout 0.1 \
     --decoder-dropout 0.1 \
@@ -58,6 +62,6 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
-    --output cz-en/output.txt \
+    --checkpoint-path assignment3/cz-en/checkpoints/checkpoint_best.pt \
+    --output assignment3/cz-en/output.txt \
     --max-len 300
