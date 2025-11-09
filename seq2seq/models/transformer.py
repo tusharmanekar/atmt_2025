@@ -5,7 +5,7 @@ from seq2seq import utils
 from seq2seq.models import register_model, register_model_architecture
 from seq2seq.models import Seq2SeqModel, Seq2SeqEncoder, Seq2SeqDecoder
 import sentencepiece as spm
-from rope import apply_rotary_pos_emb
+from .rope import apply_rotary_pos_emb
 
 
 
