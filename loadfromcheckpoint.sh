@@ -1,32 +1,34 @@
 #!/usr/bin/bash -l
 #SBATCH --partition teaching
-#SBATCH --time=0:35:0
+#SBATCH --time=6:0:0
 #SBATCH --ntasks=1
 #SBATCH --mem=8GB
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
 #SBATCH --output=toy_example.out
 
-# module load gpu
-# module load mamba
-# source activate atmt
-# export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
+module load gpu
+module load mamba
+source activate atmt
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 
-# clean up from previous runs
-# rm -rf toy_example/data/prepared
-# rm -rf toy_example/tokenizers
+# Just to be safe, ensure dirs still exist
+mkdir -p assignment3/cz-en/data/prepared
+mkdir -p assignment3/cz-en/logs
+mkdir -p assignment3/cz-en/checkpoints
 
 python train.py \
-    --data toy_example/data/prepared/ \
-    --src-tokenizer toy_example/tokenizers/cz-bpe-1000.model \
-    --tgt-tokenizer toy_example/tokenizers/en-bpe-1000.model \
+    --cuda \
+    --data assignment3/cz-en/data/prepared/ \
+    --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
+    --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
     --source-lang cz \
     --target-lang en \
-    --batch-size 32 \
+    --batch-size 64 \
     --arch transformer \
-    --max-epoch 3 \
-    --log-file toy_example/logs/train.log \
-    --save-dir toy_example/checkpoints/ \
+    --max-epoch 1 \
+    --log-file assignment3/cz-en/logs/train_resume.log \
+    --save-dir assignment3/cz-en/checkpoints/ \
     --restore-file checkpoint_last.pt \
     --encoder-dropout 0.1 \
     --decoder-dropout 0.1 \
@@ -34,17 +36,17 @@ python train.py \
     --attention-heads 4 \
     --dim-feedforward-encoder 1024 \
     --dim-feedforward-decoder 1024 \
-    --max-seq-len 100 \
+    --max-seq-len 300 \
     --n-encoder-layers 3 \
     --n-decoder-layers 3
 
-# python translate.py \
-#     --input toy_example/data/raw/test.cz \
-#     --src-tokenizer toy_example/tokenizers/cz-bpe-1000.model \
-#     --tgt-tokenizer toy_example/tokenizers/en-bpe-1000.model \
-#     --checkpoint-path toy_example/checkpoints/checkpoint_best.pt \
-#     --batch-size 1 \
-#     --max-len 100 \
-#     --output toy_example/toy_example_output.en \
-#     --bleu \
-#     --reference toy_example/data/raw/test.en
+python translate.py \
+    --input ~/shares/cz-en/data/raw/test.cz \
+    --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
+    --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
+    --checkpoint-path assignment3/cz-en/checkpoints/checkpoint_best.pt \
+    --batch-size 1 \
+    --max-len 300 \
+    --output assignment3/cz-en/output.txt \
+    --bleu \
+    # --reference toy_example/data/raw/test.en
