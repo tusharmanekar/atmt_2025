@@ -48,5 +48,3 @@ python translate.py \
     --batch-size 1 \
     --max-len 300 \
     --output assignment3/cz-en/output.txt \
-    --bleu \
-    # --reference toy_example/data/raw/test.en
