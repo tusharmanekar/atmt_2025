@@ -48,3 +48,5 @@ python translate.py \
     --batch-size 1 \
     --max-len 300 \
     --output assignment3/cz-en/output.txt \
+    --bleu \
+    --reference ~/shares/cz-en/data/raw/test.en 
