@@ -25,3 +25,8 @@ toy_example/toy_example_output.en
 seq2seq/embedding_saver.py
 
 assignment_results/
+
+assignment3/cz-en/checkpoints/checkpoint_best.pt
+assignment3/cz-en/data/prepared/train.cz
+assignment3/cz-en/data/prepared/train.en
+assignment3/cz-en/checkpoints/checkpoint_last.pt
