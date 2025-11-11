@@ -41,6 +41,7 @@ python train.py \
     --n-decoder-layers 3
 
 python translate.py \
+    --cuda \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
