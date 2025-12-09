@@ -17,7 +17,7 @@ for alpha in 0.0 0.3 0.6 1.0; do
     echo "Running translation with alpha = ${alpha}"
     python translate_a5.py \
         --cuda \
-        --input ~/shares/cz-en/data/raw/test_small.cz \
+        --input /home/tmanek/atmt_subsets/test_small.cz \
         --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
         --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
         --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
