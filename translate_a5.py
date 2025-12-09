@@ -17,7 +17,7 @@ from torch.serialization import default_restore_location
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from seq2seq.decode import beam_search_decode, decode
+from seq2seq.decode import beam_search_decode, decode, beam_search_decode_absolute_prun, beam_search_decode_relative_prun
 from seq2seq.data.tokenizer import BPETokenizer
 from seq2seq import models, utils
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
@@ -49,9 +49,8 @@ def get_args():
     # BLEU computation arguments
     parser.add_argument('--bleu', action='store_true', help='If set, compute BLEU score after translation')
     parser.add_argument('--reference', type=str, help='Path to the reference file (one sentence per line, required if --bleu is set)')
-    
-    return parser.parse_args()
 
+    return parser.parse_args()
 
 def main(args):
     """ Main translation function' """
