@@ -26,5 +26,7 @@ seq2seq/embedding_saver.py
 
 assignment_results/
 
-assignment3/**/checkpoints/
+assignment3/**/checkpoints  /
 assignment3/**/data/prepared/
+
+plots.py

@@ -40,6 +40,16 @@ def decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Te
         predicted_tokens.append(seq)
     return predicted_tokens
 
+def length_penalty(seq_len: int, alpha: float) -> float:
+    lp = ((5 + seq_len) ** alpha) / (6 ** alpha)
+    return lp
+
+def lp_scoring(seq: torch.Tensor, raw_score: float, alpha: float) -> float:
+    # number of target tokens excluding BOS therefore we do -1 or it throws error
+    seq_len = seq.size(1) - 1
+    lp = length_penalty(seq_len, alpha)
+    return raw_score / lp
+
 def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int,
                        tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device, beam_size: int = 5, alpha: float = 0.7):
     """Beam Search decoding compatible with Transformer-based Seq2Seq models."""
@@ -70,7 +80,9 @@ def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_ma
                 new_score = score + topk_log_probs[:, k].item()
                 new_beams.append((new_seq, new_score))
 
-        beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_size]
+        # beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_size]
+        beams = sorted(new_beams, key=lambda beam: lp_scoring(beam[0], beam[1], alpha), reverse=True)[:beam_size]
+
         # __QUESTION 5: Why do we check for EOS here and what does it imply for beam search?
         if all(seq[0, -1].item() == EOS for seq, _ in beams):
             break
