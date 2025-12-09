@@ -29,4 +29,5 @@ assignment_results/
 assignment3/**/checkpoints  /
 assignment3/**/data/prepared/
 
-plots.py
+plots.pyassignment3/cz-en/checkpoints/
+assignment3/cz-en/checkpoints/
